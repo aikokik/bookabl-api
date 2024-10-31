@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "-ra -s -vvv"
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore:.*utcfromtimestamp:DeprecationWarning:google.protobuf"
+]
+
+[tool.coverage.run]
+branch = true
+omit = []
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+exclude_lines = [
+    "pragma: no cover"
+]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = []
+
+[tool.ruff.lint]
+select = [
+    "F",
+    "T20",
+    "I",
+    "W",
+    "E",
+    "N"
+]
+
+[tool.ruff.lint.isort]
+known-first-party = []
+known-third-party = []
+
+[tool.mypy]
+strict = true
+namespace_packages = true
+explicit_package_bases = true

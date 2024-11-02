@@ -1,6 +1,7 @@
 # ruff: noqa: N815
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -24,21 +25,21 @@ class BookingFormAction(StrEnum):
 
 
 class RequiredDeposit(BaseModel):
-    amount_units: int
-    amount_per: str = "guest"
+    amountUnits: int
+    amountPer: str = "guest"
     currency: str
     terms: str | None = None
 
 
 class BookingTimeSlotMetaData(BaseModel):
-    sevenRooms: dict | None = None
-    openTable: dict | None = None
-    resy: dict | None = None
-    designMyNight: dict | None = None
-    resDiary: dict | None = None
-    theFork: dict | None = None
-    quandoo: dict | None = None
-    tock: dict | None = None
+    sevenRooms: dict[str, Any] | None = None
+    openTable: dict[str, Any] | None = None
+    resy: dict[str, Any] | None = None
+    designMyNight: dict[str, Any] | None = None
+    resDiary: dict[str, Any] | None = None
+    theFork: dict[str, Any] | None = None
+    quandoo: dict[str, Any] | None = None
+    tock: dict[str, Any] | None = None
 
 
 class AvailabilitySlot(BaseModel):

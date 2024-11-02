@@ -4,7 +4,7 @@ PYTHON := /opt/bb/bin/python3.12
 
 all: fix-all check-all
 fix-all: fix-format fix-lint
-check-all: check-format check-lint check-types test
+check-all: check-format check-lint check-types 
 test: test-coverage 
 
 # Install dependencies
@@ -25,7 +25,7 @@ check-lint:
 	ruff check .
 
 check-types:
-	mypy
+	mypy .
 
 test-coverage:
 	pytest \

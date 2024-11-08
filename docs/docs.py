@@ -60,6 +60,18 @@ AVAILABILITY_DOCS = {
             ]
         }
     """,
+    "single_date_description": """
+        Fetches availability slots for a venue for a single date.
+        Endpoint: /venues/{venue_id}/availability/{date}
+
+        Args:
+            venue_id: The ID of the venue
+            date: The date in YYYY-MM-DD format
+            covers: Number of guests
+
+        Returns:
+            AvailabilityResponse containing available slots
+    """,
 }
 
 PRE_CONFIRMATION_DOCS = {

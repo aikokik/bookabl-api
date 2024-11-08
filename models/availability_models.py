@@ -46,13 +46,14 @@ class AvailabilitySlot(BaseModel):
     provider: BookingProvider
     timeSlot: str = Field(..., description="The time of the booking (in HH:mm format)")
     date: datetime
+    covers: int
     url: str
-    maxDuration: int | None = Field(None, description="Maximum duration in seconds")
-    minDuration: int | None = None
+    maxDuration: int | None = Field(None, description="Maximum duration in minutes")
+    minDuration: int | None = Field(None, description="Minimum duration in minutes")
     tag: str | None = None
-    metaData: BookingTimeSlotMetaData | None = None
+    metaData: BookingTimeSlotMetaData
     bookingFormAction: BookingFormAction
-    requiredDeposit: RequiredDeposit | None = None
+    requiredDeposit: bool = False
     dobRequired: bool = False
 
 

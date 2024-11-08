@@ -2,3 +2,4 @@ fastapi
 uvicorn
 pydantic
 python-dateutil
+requests>=2.31.0

@@ -40,7 +40,7 @@ class Venue(BaseModel):
 
 
 class BookingUser(BaseModel):
-    id: str
+    id: str  # TODO: what is it?
     isOwner: bool
     email: str | None = None
     phone: str | None = None

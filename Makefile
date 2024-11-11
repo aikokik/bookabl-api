@@ -50,3 +50,6 @@ clean:
 activate:
 	source .venv/bin/activate
 
+dev:
+	PYTHONPATH=. uvicorn main:app --reload --log-level debug --use-colors
+

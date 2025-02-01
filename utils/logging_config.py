@@ -23,11 +23,7 @@ def setup_logging(
         "disable_existing_loggers": False,
         "formatters": {
             "simple": {
-                "format": (
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s - "
-                    "method:%(method)s - time:%(execution_time)s"
-                ),
-                "defaults": {"method": "N/A", "execution_time": "N/A"},
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             },
         },
         "handlers": {

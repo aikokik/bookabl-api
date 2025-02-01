@@ -14,7 +14,7 @@ from models.availability_models import (
     BookingProvider,
     BookingTimeSlotMetaData,
 )
-from models.booking_models import Booking, BookingStatus, BookingUser, Partner, Venue
+from models.booking_models import Booking, BookingStatus, BookingUser, Venue
 from utils.decorators import log_execution_time
 
 logger = logging.getLogger(__name__)
@@ -30,6 +30,11 @@ class BookingDetails(NamedTuple):
 class TimeSlot(NamedTuple):
     time: str
     action: str
+
+
+class BookingType(NamedTuple):
+    id: str
+    name: str
 
 
 class RequestFailedError(Exception):
@@ -67,14 +72,13 @@ class DesignMyNightBookingAPI:
     CACHE_SIZE = 128
 
     # Request configuration
-    BATCH_SIZE = 10  # For concurrent requests
     REQUEST_TIMEOUT = 30  # seconds
-    MAX_RETRIES = 3
+    MAX_RETRIES = 1
 
     def __init__(self) -> None:
         self.headers = {"Content-Type": "application/json"}
         self.session: aiohttp.ClientSession | None = None
-        self._booking_types_cache: dict[str, set[str]] = {}
+        self._booking_types_cache: dict[str, set[BookingType]] = {}
         self._last_cache_update: dict[str, float] = defaultdict(float)
         # Add SSL context configuration
         self.ssl_context = ssl.create_default_context()
@@ -154,8 +158,8 @@ class DesignMyNightBookingAPI:
         for booking_type in booking_types:
             tasks.extend(
                 [
-                    self.__get_time_slots(venue_id, booking_type, covers, date),
-                    self.__get_booking_details(venue_id, booking_type, covers, date),
+                    self.__get_time_slots(venue_id, booking_type.id, covers, date),
+                    self.__get_booking_details(venue_id, booking_type.id, covers, date),
                 ]
             )
 
@@ -192,7 +196,7 @@ class DesignMyNightBookingAPI:
         booking_details: BookingDetails,
         date: datetime,
         covers: int,
-        booking_type: str,
+        booking_type: BookingType,
     ) -> AvailabilitySlot:
         booking_form_action = (
             BookingFormAction.WEBSITE
@@ -209,7 +213,7 @@ class DesignMyNightBookingAPI:
             url=booking_details.link,
             maxDuration=90,
             minDuration=45,
-            tag=booking_type,
+            tag=booking_type.name,
             metaData=BookingTimeSlotMetaData(designMyNight=booking_details.details),
             bookingFormAction=booking_form_action,
             requiredDeposit=booking_details.deposit_required,
@@ -224,18 +228,20 @@ class DesignMyNightBookingAPI:
         availability_slot: AvailabilitySlot,
         covers: int,
     ) -> Booking:
-        params = {
-            "venue_id": venue_id,
-            "type": availability_slot.tag,
-            "date": availability_slot.date.strftime("%Y-%m-%d"),
-            "time": availability_slot.timeSlot,
-            "num_people": covers,
-            "source": "partner",
-            "first_name": user.firstName,
-            "last_name": user.lastName,
-            "email": user.email,
-            "phone": user.phone,
-        }
+        params = availability_slot.metaData.designMyNight or {}
+        params.update(
+            {
+                "venue_id": venue_id,
+                "date": availability_slot.date.strftime("%Y-%m-%d"),
+                "time": availability_slot.timeSlot,
+                "num_people": covers,
+                "source": "partner",
+                "first_name": user.firstName,
+                "last_name": user.lastName,
+                "email": user.email,
+                "phone": user.phone,
+            }
+        )
 
         missing_fields = self.REQUIRED_BOOKING_FIELDS - params.keys()
         if missing_fields:
@@ -249,7 +255,8 @@ class DesignMyNightBookingAPI:
         logger.info(f"Cancelling booking: {booking_id=}")
         try:
             await self._make_request_with_retry(
-                "POST", f"/bookings/{booking_id}", json={"status": "deleted"}
+                "POST",
+                f"/cancel-booking/{booking_id}",
             )
             logger.info(f"Booking cancelled successfully: {booking_id=}")
         except Exception as e:
@@ -276,22 +283,21 @@ class DesignMyNightBookingAPI:
             bookedAt=booking["created_date"],
             status=(
                 BookingStatus.COMPLETED
-                if payload["bookingStatus"] == "complete"
+                if payload["bookingStatus"] == "confirmed"
                 else BookingStatus.REQUESTED
             ),
             tag=booking["type"]["name"],
             originalEmail=booking["email"],
             venue=Venue(
-                id=booking["venue_id"],
+                id=payload["venue"]["_id"],
                 name=payload["venue"]["title"],
                 town="London",
             ),
             users=[user],
-            partner=Partner(id=booking["created_by"], name=booking["reference"]),
         )
 
     @log_execution_time
-    async def __get_booking_types(self, venue_id: str) -> set[str]:
+    async def __get_booking_types(self, venue_id: str) -> set[BookingType]:
         current_time = datetime.now().timestamp()
 
         # Check cache
@@ -316,7 +322,7 @@ class DesignMyNightBookingAPI:
             )
 
             booking_types = {
-                item["value"]["id"]
+                BookingType(id=item["value"]["id"], name=item["value"]["name"])
                 for item in data.get("payload", {})
                 .get("validation", {})
                 .get("type", {})

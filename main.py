@@ -21,3 +21,4 @@ app.add_middleware(
 )
 
 app.include_router(booking.router, prefix="/api/v1", tags=["bookings"])
+# some comment to check github actions

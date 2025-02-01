@@ -58,7 +58,6 @@ class Booking(BaseModel):
     originalEmail: str
     venue: Venue
     users: list[BookingUser]
-    partner: Partner
     deposit: Deposit | None = None
 
 

@@ -140,4 +140,5 @@ async def list_bookings(
 async def cancel_booking(
     booking_id: str = Path(..., description="The ID of the booking to cancel"),
 ) -> None:
-    return None
+    async with DesignMyNightBookingAPI() as api:
+        await api.cancel_booking(booking_id)

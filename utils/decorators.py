@@ -15,7 +15,8 @@ def log_execution_time(func: Callable[..., T]) -> Callable[..., T]:
             result = await func(*args, **kwargs)  # type: ignore
             execution_time = time.time() - start_time
             logger.debug(
-                f"Method {func.__name__} execution completed. Execution time: {execution_time:.2f}s",
+                f"Method {func.__name__} execution completed with args: {args}, kwargs: {kwargs}. "
+                f"Execution time: {execution_time:.2f}s",
             )
             return cast(T, result)
         except Exception as e:

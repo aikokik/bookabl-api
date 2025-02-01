@@ -1,0 +1,42 @@
+{
+    "payload": {
+        "booking": {
+            "_id": "67323a1bde3b1b1ce84cc21c",
+            "created_date": "2024-11-11T17:08:43",
+            "last_updated": "2024-11-11T17:08:43",
+            "reference": "DMN-16881748570",
+            "venue_id": "512b202ed5d190d2978ca486",
+            "date": "2024-11-19T00:00:00",
+            "time": "07:00",
+            "type": {
+                "guestlist": true,
+                "id": "5a74362e50f90061506900aa",
+                "name": "Venue Hire",
+                "private_hire": true,
+                "use_standing_capacity": false
+            },
+            "num_people": 2,
+            "first_name": "Alex",
+            "last_name": "Smith",
+            "email": "alex@aptisai.com",
+            "source": "partner",
+            "payments": [],
+            "deposits": []
+        },
+        "bookingStatus": "received",
+        "venue": {
+            "_id": "512b202ed5d190d2978ca486",
+            "type": "venue",
+            "title": "Balls Brothers Austin Friars",
+            "path": "/london/bars/city-of-london/balls-brothers-austin-friars",
+            "page_type": "venue"
+        }
+    },
+    "status": 200,
+    "requestTime": "2024-11-11T17:08:43",
+    "responseTime": "2024-11-11T17:08:44",
+    "statusText": "OK",
+    "url": "/v4/bookings",
+    "method": "POST",
+    "params": []
+}
